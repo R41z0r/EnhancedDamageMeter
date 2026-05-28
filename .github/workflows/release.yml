@@ -79,6 +79,11 @@ jobs:
         shell: bash
         run: bash source/scripts/prepare_packager_gates.sh "${{ steps.source.outputs.ref }}"
 
+      - name: Extract standalone changelog
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
+        shell: bash
+        run: python3 scripts/extract_changelog.py source/CHANGELOG.md "${{ steps.source.outputs.version }}" CHANGELOG.md
+
       - name: Build standalone addon
         if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
@@ -104,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/rsync -a --exclude '.DS_Store' build/EnhancedDamageMeter/ ./
-          git add -f -- EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
+          git add -f -- CHANGELOG.md EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
           git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
       - name: Create Package and release
