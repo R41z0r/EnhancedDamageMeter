@@ -9,6 +9,7 @@ ignore:
   - .github
   - .gitignore
   - .luacheckrc
+  - build
   - libs
   - source
   - scripts
@@ -21,6 +22,3 @@ ignore:
 manual-changelog:
   filename: CHANGELOG.md
   markup-type: markdown
-
-move-folders:
-  build/EnhancedDamageMeter: EnhancedDamageMeter

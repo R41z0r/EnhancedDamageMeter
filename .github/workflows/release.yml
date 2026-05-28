@@ -53,27 +53,27 @@ jobs:
 
       - name: Build standalone addon
         shell: bash
-        run: bash scripts/build.sh build/EnhancedDamageMeter source/EnhanceQoL
+        run: bash scripts/build.sh EnhancedDamageMeter source/EnhanceQoL
 
       - name: Stamp dispatched version
         if: github.event_name == 'repository_dispatch'
         shell: bash
         run: |
           set -euo pipefail
-          perl -0pi -e 's/\@project-version\@/${{ steps.source.outputs.version }}/g' build/EnhancedDamageMeter/EnhancedDamageMeter.toc
+          perl -0pi -e 's/\@project-version\@/${{ steps.source.outputs.version }}/g' EnhancedDamageMeter/EnhancedDamageMeter.toc
 
       - name: Validate generated Lua
         uses: nebularg/actions-luacheck@v1
         with:
-          args: "--no-color -q build/EnhancedDamageMeter"
+          args: "--no-color -q EnhancedDamageMeter"
           annotate: warning
 
       - name: Stage generated package
         shell: bash
         run: |
           set -euo pipefail
-          git add -f -- build/EnhancedDamageMeter
-          git restore --staged -- build/EnhancedDamageMeter/libs/LibEQOL/libs/LibStub 2>/dev/null || true
+          git add -f -- EnhancedDamageMeter
+          git restore --staged -- EnhancedDamageMeter/libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
       - name: Create Package and release
         if: github.event_name != 'repository_dispatch'
