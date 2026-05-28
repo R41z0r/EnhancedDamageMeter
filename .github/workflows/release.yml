@@ -14,6 +14,10 @@ on:
         required: true
         type: string
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -25,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           ref="${{ github.event.client_payload.source_ref || inputs.source_ref || github.ref_name }}"
-          version="${{ github.event.client_payload.source_ref || github.ref_name }}"
+          version="${{ github.event.client_payload.source_ref || inputs.source_ref || github.ref_name }}"
           echo "ref=${ref}" >> "$GITHUB_OUTPUT"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
 
@@ -33,7 +37,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Trigger tag release
+        id: trigger_tag
+        if: github.event_name != 'push' && github.ref_type != 'tag'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.source.outputs.version }}"
+          if [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            git tag -f "${version}"
+            git push -f origin "refs/tags/${version}"
+            curl -fsSL \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/workflows/release.yml/dispatches" \
+              -d "{\"ref\":\"${version}\",\"inputs\":{\"source_ref\":\"${version}\"}}"
+            echo "package_now=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "package_now=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout EnhanceQoL source
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         uses: actions/checkout@v6
         with:
           repository: R41z0r/EnhanceQoL
@@ -42,32 +69,37 @@ jobs:
           fetch-depth: 0
 
       - name: Install LibEQOL into source
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         uses: R41z0r/LibEQOL@v1.0.0
         with:
           destination: vendor
 
       - name: Prepare source packager gates
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
         run: bash source/scripts/prepare_packager_gates.sh "${{ steps.source.outputs.ref }}"
 
       - name: Build standalone addon
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
         run: bash scripts/build.sh build/EnhancedDamageMeter source/EnhanceQoL
 
       - name: Stamp dispatched version
-        if: github.event_name == 'repository_dispatch'
+        if: github.event_name == 'repository_dispatch' && steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
         run: |
           set -euo pipefail
           perl -0pi -e 's/\@project-version\@/${{ steps.source.outputs.version }}/g' build/EnhancedDamageMeter/EnhancedDamageMeter.toc
 
       - name: Validate generated Lua
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         uses: nebularg/actions-luacheck@v1
         with:
           args: "--no-color -q build/EnhancedDamageMeter"
           annotate: warning
 
       - name: Stage generated package
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -75,17 +107,8 @@ jobs:
           git add -f -- EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
           git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
-      - name: Use source tag for package version
-        if: github.event_name != 'push'
-        shell: bash
-        run: |
-          set -euo pipefail
-          version="${{ steps.source.outputs.version }}"
-          if [[ "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            git tag -f "${version}"
-          fi
-
       - name: Create Package and release
+        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         uses: BigWigsMods/packager@v2
         env:
           WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
