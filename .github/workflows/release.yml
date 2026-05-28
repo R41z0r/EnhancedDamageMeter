@@ -77,18 +77,7 @@ jobs:
           git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
       - name: Create Package and release
-        if: github.event_name != 'repository_dispatch'
         uses: BigWigsMods/packager@v2
-        env:
-          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
-          CF_API_KEY: ${{ secrets.CURSE_API_TOKEN }}
-          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Package and release from EnhanceQoL tag
-        if: github.event_name == 'repository_dispatch'
-        uses: BigWigsMods/packager@v2
-        with:
-          args: -g ${{ steps.source.outputs.version }}
         env:
           WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
           CF_API_KEY: ${{ secrets.CURSE_API_TOKEN }}
