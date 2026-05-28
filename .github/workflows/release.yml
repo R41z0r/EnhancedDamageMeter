@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - "*"
+  repository_dispatch:
+    types:
+      - enhanceqol_release
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: "EnhanceQoL ref/tag to build from"
+        required: false
+        default: "main"
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve source ref
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          ref="${{ github.event.client_payload.source_ref || inputs.source_ref || github.ref_name }}"
+          version="${{ github.event.client_payload.source_ref || github.ref_name }}"
+          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Checkout EnhanceQoL source
+        uses: actions/checkout@v6
+        with:
+          repository: R41z0r/EnhanceQoL
+          ref: ${{ steps.source.outputs.ref }}
+          path: source
+          fetch-depth: 0
+
+      - name: Install LibEQOL into source
+        uses: R41z0r/LibEQOL@v1.0.0
+        with:
+          destination: source/EnhanceQoL/libs
+
+      - name: Prepare source packager gates
+        shell: bash
+        run: bash source/scripts/prepare_packager_gates.sh "${{ steps.source.outputs.ref }}"
+
+      - name: Build standalone addon
+        shell: bash
+        run: bash scripts/build.sh build/EnhancedDamageMeter source/EnhanceQoL
+
+      - name: Stamp dispatched version
+        if: github.event_name == 'repository_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+          perl -0pi -e 's/\@project-version\@/${{ steps.source.outputs.version }}/g' build/EnhancedDamageMeter/EnhancedDamageMeter.toc
+
+      - name: Validate generated Lua
+        uses: nebularg/actions-luacheck@v1
+        with:
+          args: "--no-color -q build/EnhancedDamageMeter"
+          annotate: warning
+
+      - name: Create Package and release
+        if: github.event_name != 'repository_dispatch'
+        uses: BigWigsMods/packager@v2
+        env:
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+          CF_API_KEY: ${{ secrets.CURSE_API_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Package and release from EnhanceQoL tag
+        if: github.event_name == 'repository_dispatch'
+        uses: BigWigsMods/packager@v2
+        with:
+          args: -g ${{ steps.source.outputs.version }}
+        env:
+          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+          CF_API_KEY: ${{ secrets.CURSE_API_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}

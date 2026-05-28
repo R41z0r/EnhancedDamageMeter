@@ -1,0 +1,26 @@
+package-as: EnhancedDamageMeter
+
+enable-nolib-creation: no
+
+ignore:
+  - .DS_Store
+  - .env
+  - .git
+  - .github
+  - .gitignore
+  - .luacheckrc
+  - source
+  - scripts
+  - build
+  - Core.lua
+  - EnhancedDamageMeter.toc
+  - Functions.lua
+  - Icons
+  - Settings.lua
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+move-folders:
+  build/EnhancedDamageMeter: EnhancedDamageMeter

@@ -1,0 +1,49 @@
+## Interface: 120005, 120007
+## Title: Enhanced Damage Meter
+## Title-deDE: Enhanced Damage Meter
+## Title-esES: Enhanced Damage Meter
+## Title-esMX: Enhanced Damage Meter
+## Title-frFR: Enhanced Damage Meter
+## Title-itIT: Enhanced Damage Meter
+## Title-ptBR: Enhanced Damage Meter
+## Title-ruRU: Enhanced Damage Meter
+## Title-koKR: Enhanced Damage Meter
+## Title-zhCN: Enhanced Damage Meter
+## Title-zhTW: Enhanced Damage Meter
+## Author: R41Z0R
+## Version: @project-version@
+## IconTexture: Interface\AddOns\EnhancedDamageMeter\Icons\Icon.tga
+## Category: Combat
+## Notes: A lightweight, highly customizable damage meter for World of Warcraft Retail.
+## Notes-deDE: Ein leichtgewichtiges, umfangreich anpassbares Schadensmeter für World of Warcraft Retail.
+## Notes-esES: Un medidor de daño ligero y muy personalizable para World of Warcraft Retail.
+## Notes-esMX: Un medidor de daño ligero y muy personalizable para World of Warcraft Retail.
+## Notes-frFR: Un compteur de dégâts léger et hautement personnalisable pour World of Warcraft Retail.
+## Notes-itIT: Un misuratore dei danni leggero e altamente personalizzabile per World of Warcraft Retail.
+## Notes-ptBR: Um medidor de dano leve e altamente personalizável para World of Warcraft Retail.
+## Notes-ruRU: Легкий и гибко настраиваемый измеритель урона для World of Warcraft Retail.
+## Notes-koKR: World of Warcraft Retail용 가볍고 세밀하게 설정할 수 있는 피해 미터입니다.
+## Notes-zhCN: 一款适用于 World of Warcraft Retail 的轻量级、高度可自定义伤害统计。
+## Notes-zhTW: 一款適用於 World of Warcraft Retail 的輕量級、高度可自訂傷害統計。
+## SavedVariables: EnhancedDamageMeterDB
+## X-Wago-ID: nGv7YjNx
+## X-Curse-Project-ID: 1556720
+## OptionalDeps: EnhanceQoLSharedMedia
+## Retail: true
+## X-Compatible-With: retail
+
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+libs\AceLocale-3.0\AceLocale-3.0.xml
+libs\LibDeflate\lib.xml
+libs\AceSerializer-3.0\AceSerializer-3.0.xml
+libs\LibSharedMedia-3.0\lib.xml
+libs\LibEQOL\LibEQOL.xml
+
+Locales\[TextLocale].lua
+Core.lua
+Functions.lua
+Core\EditModeLib.lua
+Core\EditMode.lua
+DamageMeter.lua
+Settings.lua
