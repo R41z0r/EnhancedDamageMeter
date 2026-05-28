@@ -18,6 +18,11 @@ if [ ! -d "${SOURCE_DIR}" ]; then
 	exit 1
 fi
 
+LIBEQOL_DIR="${TEMPLATE_DIR}/libs/LibEQOL"
+if [ ! -d "${LIBEQOL_DIR}" ]; then
+	LIBEQOL_DIR="${SOURCE_DIR}/libs/LibEQOL"
+fi
+
 rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}/libs" "${OUT_DIR}/Locales" "${OUT_DIR}/Core"
 
@@ -44,7 +49,7 @@ copy_dir "${SOURCE_DIR}/libs/AceLocale-3.0" "${OUT_DIR}/libs/AceLocale-3.0"
 copy_dir "${SOURCE_DIR}/libs/LibDeflate" "${OUT_DIR}/libs/LibDeflate"
 copy_dir "${SOURCE_DIR}/libs/AceSerializer-3.0" "${OUT_DIR}/libs/AceSerializer-3.0"
 copy_dir "${SOURCE_DIR}/libs/LibSharedMedia-3.0" "${OUT_DIR}/libs/LibSharedMedia-3.0"
-copy_dir "${SOURCE_DIR}/libs/LibEQOL" "${OUT_DIR}/libs/LibEQOL"
+copy_dir "${LIBEQOL_DIR}" "${OUT_DIR}/libs/LibEQOL"
 
 find "${OUT_DIR}/libs/LibEQOL" -type f \( -name '*.lua' -o -name '*.xml' \) -print0 |
 	xargs -0 perl -0pi -e 's/LibEQOL(?:\@project-abbreviated-hash\@|[A-Za-z0-9]+)?_(SettingsListSectionHintTemplate|MultiDropdownTemplate|ScrollDropdownTemplate|InputControlTemplate|ColorOverridesPanel|ColorOverridesPanelNoHead|SoundDropdownTemplate|SortableListTemplate)/LibEQOL_EnhancedDamageMeter_$1/g'

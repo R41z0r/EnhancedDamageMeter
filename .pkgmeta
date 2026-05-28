@@ -9,6 +9,7 @@ ignore:
   - .github
   - .gitignore
   - .luacheckrc
+  - libs
   - source
   - scripts
   - build

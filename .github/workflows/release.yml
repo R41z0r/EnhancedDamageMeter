@@ -45,7 +45,7 @@ jobs:
       - name: Install LibEQOL into source
         uses: R41z0r/LibEQOL@v1.0.0
         with:
-          destination: source/EnhanceQoL/libs
+          destination: libs
 
       - name: Prepare source packager gates
         shell: bash
