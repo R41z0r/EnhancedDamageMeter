@@ -76,6 +76,16 @@ jobs:
           git add -f -- EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
           git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
+      - name: Use source tag for package version
+        if: github.event_name != 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.source.outputs.version }}"
+          if [[ "${version}" =~ ^[0-9]+\\.[0-9]+\\.[0-9]+ ]]; then
+            git tag -f "${version}"
+          fi
+
       - name: Create Package and release
         uses: BigWigsMods/packager@v2
         env:
