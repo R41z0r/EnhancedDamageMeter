@@ -2,5 +2,10 @@
 /.env
 /.env.local
 /build/
+/Core/
+/DamageMeter.lua
 /EnhancedDamageMeter/
+/libs/
+/Locales/
 /source/
+/vendor/

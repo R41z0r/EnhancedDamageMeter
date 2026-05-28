@@ -10,15 +10,7 @@ ignore:
   - .gitignore
   - .luacheckrc
   - build
-  - libs
+  - CHANGELOG.md
   - source
   - scripts
-  - Core.lua
-  - EnhancedDamageMeter.toc
-  - Functions.lua
-  - Icons
-  - Settings.lua
-
-manual-changelog:
-  filename: CHANGELOG.md
-  markup-type: markdown
+  - vendor

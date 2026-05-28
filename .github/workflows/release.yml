@@ -45,7 +45,7 @@ jobs:
       - name: Install LibEQOL into source
         uses: R41z0r/LibEQOL@v1.0.0
         with:
-          destination: libs
+          destination: vendor
 
       - name: Prepare source packager gates
         shell: bash
@@ -53,27 +53,28 @@ jobs:
 
       - name: Build standalone addon
         shell: bash
-        run: bash scripts/build.sh EnhancedDamageMeter source/EnhanceQoL
+        run: bash scripts/build.sh build/EnhancedDamageMeter source/EnhanceQoL
 
       - name: Stamp dispatched version
         if: github.event_name == 'repository_dispatch'
         shell: bash
         run: |
           set -euo pipefail
-          perl -0pi -e 's/\@project-version\@/${{ steps.source.outputs.version }}/g' EnhancedDamageMeter/EnhancedDamageMeter.toc
+          perl -0pi -e 's/\@project-version\@/${{ steps.source.outputs.version }}/g' build/EnhancedDamageMeter/EnhancedDamageMeter.toc
 
       - name: Validate generated Lua
         uses: nebularg/actions-luacheck@v1
         with:
-          args: "--no-color -q EnhancedDamageMeter"
+          args: "--no-color -q build/EnhancedDamageMeter"
           annotate: warning
 
       - name: Stage generated package
         shell: bash
         run: |
           set -euo pipefail
-          git add -f -- EnhancedDamageMeter
-          git restore --staged -- EnhancedDamageMeter/libs/LibEQOL/libs/LibStub 2>/dev/null || true
+          /usr/bin/rsync -a --delete --exclude '.DS_Store' build/EnhancedDamageMeter/ ./
+          git add -f -- EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
+          git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
       - name: Create Package and release
         if: github.event_name != 'repository_dispatch'
