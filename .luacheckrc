@@ -38,6 +38,7 @@ exclude_files = {
 	"EnhancedDamageMeter/libs/**",
 	"EnhanceQoL/libs/LibEQOL/**",
 	"source/**",
+	"vendor/**",
 	"EnhanceQoLBags/**",
 	"News/**",
 	"scripts/**",
