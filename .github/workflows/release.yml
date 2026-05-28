@@ -68,6 +68,13 @@ jobs:
           args: "--no-color -q build/EnhancedDamageMeter"
           annotate: warning
 
+      - name: Stage generated package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -f -- build/EnhancedDamageMeter
+          git restore --staged -- build/EnhancedDamageMeter/libs/LibEQOL/libs/LibStub 2>/dev/null || true
+
       - name: Create Package and release
         if: github.event_name != 'repository_dispatch'
         uses: BigWigsMods/packager@v2
