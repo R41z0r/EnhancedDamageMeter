@@ -72,7 +72,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          /usr/bin/rsync -a --delete --exclude '.DS_Store' build/EnhancedDamageMeter/ ./
+          /usr/bin/rsync -a --exclude '.DS_Store' build/EnhancedDamageMeter/ ./
           git add -f -- EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
           git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
