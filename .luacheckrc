@@ -42,6 +42,7 @@ exclude_files = {
 	"scripts/**",
 	"EnhanceQoL/libs/LibButtonGlow-1.0/LibButtonGlow-1.0.lua",
 	"EnhanceQoL/Modules/Aura/UF_GroupFrames.lua",
+	"libs/**",
 }
 ignore = {
 	"11./SLASH_.*", -- Setting an undefined (Slash handler) global variable
