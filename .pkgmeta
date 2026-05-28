@@ -12,7 +12,6 @@ ignore:
   - libs
   - source
   - scripts
-  - build
   - Core.lua
   - EnhancedDamageMeter.toc
   - Functions.lua
