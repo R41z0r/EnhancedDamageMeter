@@ -3,8 +3,38 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_DIR="${1:-"${ROOT_DIR}/build/EnhancedDamageMeter"}"
-SOURCE_DIR="${2:-"${ENHANCEQOL_SOURCE_DIR:-"${ROOT_DIR}/source/EnhanceQoL"}"}"
 TEMPLATE_DIR="${ROOT_DIR}"
+
+resolve_source_dir() {
+	if [ "${2:-}" != "" ]; then
+		printf '%s\n' "$2"
+		return
+	fi
+	if [ "${ENHANCEQOL_SOURCE_DIR:-}" != "" ]; then
+		printf '%s\n' "${ENHANCEQOL_SOURCE_DIR}"
+		return
+	fi
+
+	local candidates=(
+		"${ROOT_DIR}/source/EnhanceQoL"
+		"${ROOT_DIR}/../EnhanceQoL/EnhanceQoL"
+		"${ROOT_DIR}/../EnhanceQoL"
+		"${ROOT_DIR}/../WoWAddons/Raizor/EnhanceQoL"
+		"${ROOT_DIR}/../Raizor/EnhanceQoL"
+	)
+
+	local candidate
+	for candidate in "${candidates[@]}"; do
+		if [ -f "${candidate}/Submodules/DamageMeter.lua" ]; then
+			printf '%s\n' "${candidate}"
+			return
+		fi
+	done
+
+	printf '%s\n' "${ROOT_DIR}/source/EnhanceQoL"
+}
+
+SOURCE_DIR="$(resolve_source_dir "$@")"
 
 copy_dir() {
 	local source="$1"
@@ -13,8 +43,9 @@ copy_dir() {
 	/usr/bin/rsync -a --delete --exclude '.DS_Store' "${source}/" "${destination}/"
 }
 
-if [ ! -d "${SOURCE_DIR}" ]; then
+if [ ! -f "${SOURCE_DIR}/Submodules/DamageMeter.lua" ]; then
 	echo "EnhanceQoL source directory not found: ${SOURCE_DIR}" >&2
+	echo "Pass it explicitly: bash scripts/build.sh <out-dir> /path/to/EnhanceQoL" >&2
 	exit 1
 fi
 
