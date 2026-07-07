@@ -87,7 +87,7 @@ jobs:
       - name: Build standalone addon
         if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
-        run: bash scripts/build.sh build/EnhancedDamageMeter source/EnhanceQoL
+        run: bash scripts/build.sh build/EnhancedDamageMeter source
 
       - name: Stamp dispatched version
         if: github.event_name == 'repository_dispatch' && steps.trigger_tag.outputs.package_now == 'true'
