@@ -70,6 +70,7 @@ globals = {
 	"_G",
 	"bit",
 	"Constants",
+	"PixelUtil",
 
 	-- misc custom
 	"AchievementObjectiveTracker",

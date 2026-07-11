@@ -139,6 +139,153 @@ function addon.functions.GetLSMMediaNames(mediaType)
 	return (cache and cache.names) or EMPTY_TABLE
 end
 
+function addon.functions.GetLSMMediaHash(mediaType)
+	local cache = rebuildLSMCache(mediaType)
+	return (cache and cache.hash) or EMPTY_TABLE
+end
+
+function addon.functions.SetSafeBorder(frame, enabled, textureKey, size, r, g, b, a, options)
+	if not frame then return false end
+	options = type(options) == "table" and options or EMPTY_TABLE
+	local stateKey = options.stateKey or "_eqolSafeBorder"
+	local state = frame[stateKey]
+	if not state then
+		state = {}
+		frame[stateKey] = state
+	end
+
+	if not enabled then
+		state.enabled = false
+		if state.top then state.top:Hide() end
+		if state.bottom then state.bottom:Hide() end
+		if state.left then state.left:Hide() end
+		if state.right then state.right:Hide() end
+		if state.topLeft then state.topLeft:Hide() end
+		if state.topRight then state.topRight:Hide() end
+		if state.bottomLeft then state.bottomLeft:Hide() end
+		if state.bottomRight then state.bottomRight:Hide() end
+		frame:Hide()
+		return true
+	end
+
+	local defaultTexture = options.defaultTexture or "Interface\\Buttons\\WHITE8x8"
+	local texture = textureKey
+	if type(texture) ~= "string" or texture == "" or texture == "DEFAULT" then
+		texture = defaultTexture
+	elseif options.mediaType then
+		local media = addon.functions.GetLSMMediaHash(options.mediaType)
+		if type(media) == "table" and type(media[texture]) == "string" and media[texture] ~= "" then texture = media[texture] end
+	end
+
+	if options.pixelPerfect == true then
+		size = PixelUtil.SizeFromPixels(frame, size, 1)
+	else
+		size = tonumber(size) or 1
+		if size < 1 then size = 1 end
+	end
+	local useSlices = options.useSlices
+	if useSlices == nil then useSlices = texture ~= defaultTexture end
+	local layer = options.drawLayer or "BORDER"
+
+	if not state.top then
+		state.top = frame:CreateTexture(nil, layer)
+		state.bottom = frame:CreateTexture(nil, layer)
+		state.left = frame:CreateTexture(nil, layer)
+		state.right = frame:CreateTexture(nil, layer)
+		state.topLeft = frame:CreateTexture(nil, layer)
+		state.topRight = frame:CreateTexture(nil, layer)
+		state.bottomLeft = frame:CreateTexture(nil, layer)
+		state.bottomRight = frame:CreateTexture(nil, layer)
+	end
+
+	if state.texture ~= texture or state.size ~= size or state.useSlices ~= useSlices or not state.top:GetTexture() then
+		state.texture = texture
+		state.size = size
+		state.useSlices = useSlices
+
+		state.top:SetTexture(texture)
+		state.bottom:SetTexture(texture)
+		state.left:SetTexture(texture)
+		state.right:SetTexture(texture)
+		state.topLeft:SetTexture(texture)
+		state.topRight:SetTexture(texture)
+		state.bottomLeft:SetTexture(texture)
+		state.bottomRight:SetTexture(texture)
+
+		if useSlices then
+			state.topLeft:SetTexCoord(0.5078125, 0.0625, 0.5078125, 0.9375, 0.6171875, 0.0625, 0.6171875, 0.9375)
+			state.topRight:SetTexCoord(0.6328125, 0.0625, 0.6328125, 0.9375, 0.7421875, 0.0625, 0.7421875, 0.9375)
+			state.bottomLeft:SetTexCoord(0.7578125, 0.0625, 0.7578125, 0.9375, 0.8671875, 0.0625, 0.8671875, 0.9375)
+			state.bottomRight:SetTexCoord(0.8828125, 0.0625, 0.8828125, 0.9375, 0.9921875, 0.0625, 0.9921875, 0.9375)
+			state.top:SetTexCoord(0.2578125, 0.9375, 0.3671875, 0.9375, 0.2578125, 0.0625, 0.3671875, 0.0625)
+			state.bottom:SetTexCoord(0.3828125, 0.9375, 0.4921875, 0.9375, 0.3828125, 0.0625, 0.4921875, 0.0625)
+			state.left:SetTexCoord(0.0078125, 0.0625, 0.0078125, 0.9375, 0.1171875, 0.0625, 0.1171875, 0.9375)
+			state.right:SetTexCoord(0.1328125, 0.0625, 0.1328125, 0.9375, 0.2421875, 0.0625, 0.2421875, 0.9375)
+		else
+			state.top:SetTexCoord(0, 1, 0, 1)
+			state.bottom:SetTexCoord(0, 1, 0, 1)
+			state.left:SetTexCoord(0, 1, 0, 1)
+			state.right:SetTexCoord(0, 1, 0, 1)
+			state.topLeft:SetTexCoord(0, 1, 0, 1)
+			state.topRight:SetTexCoord(0, 1, 0, 1)
+			state.bottomLeft:SetTexCoord(0, 1, 0, 1)
+			state.bottomRight:SetTexCoord(0, 1, 0, 1)
+		end
+		if options.pixelPerfect == true then PixelUtil.ApplySafeBorderTextureSnapping(frame, stateKey, options.texelSnappingBias or 0) end
+
+		state.topLeft:ClearAllPoints()
+		state.topLeft:SetPoint("TOPLEFT", frame, "TOPLEFT")
+		state.topLeft:SetSize(size, size)
+		state.topRight:ClearAllPoints()
+		state.topRight:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
+		state.topRight:SetSize(size, size)
+		state.bottomLeft:ClearAllPoints()
+		state.bottomLeft:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT")
+		state.bottomLeft:SetSize(size, size)
+		state.bottomRight:ClearAllPoints()
+		state.bottomRight:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT")
+		state.bottomRight:SetSize(size, size)
+		state.top:ClearAllPoints()
+		state.top:SetPoint("TOPLEFT", state.topLeft, "TOPRIGHT")
+		state.top:SetPoint("TOPRIGHT", state.topRight, "TOPLEFT")
+		state.top:SetHeight(size)
+		state.bottom:ClearAllPoints()
+		state.bottom:SetPoint("BOTTOMLEFT", state.bottomLeft, "BOTTOMRIGHT")
+		state.bottom:SetPoint("BOTTOMRIGHT", state.bottomRight, "BOTTOMLEFT")
+		state.bottom:SetHeight(size)
+		state.left:ClearAllPoints()
+		state.left:SetPoint("TOPLEFT", state.topLeft, "BOTTOMLEFT")
+		state.left:SetPoint("BOTTOMLEFT", state.bottomLeft, "TOPLEFT")
+		state.left:SetWidth(size)
+		state.right:ClearAllPoints()
+		state.right:SetPoint("TOPRIGHT", state.topRight, "BOTTOMRIGHT")
+		state.right:SetPoint("BOTTOMRIGHT", state.bottomRight, "TOPRIGHT")
+		state.right:SetWidth(size)
+	end
+
+	state.top:SetVertexColor(r, g, b, a)
+	state.bottom:SetVertexColor(r, g, b, a)
+	state.left:SetVertexColor(r, g, b, a)
+	state.right:SetVertexColor(r, g, b, a)
+	state.topLeft:SetVertexColor(r, g, b, a)
+	state.topRight:SetVertexColor(r, g, b, a)
+	state.bottomLeft:SetVertexColor(r, g, b, a)
+	state.bottomRight:SetVertexColor(r, g, b, a)
+	if options.pixelPerfect == true then PixelUtil.ApplySafeBorderTextureSnapping(frame, stateKey, options.texelSnappingBias or 0) end
+
+	state.top:Show()
+	state.bottom:Show()
+	state.left:Show()
+	state.right:Show()
+	state.topLeft:Show()
+	state.topRight:Show()
+	state.bottomLeft:Show()
+	state.bottomRight:Show()
+	frame:Show()
+	state.enabled = true
+	return true
+end
+
 function addon.functions.GetGlobalFontConfigKey() return GLOBAL_FONT_CONFIG_KEY end
 
 function addon.functions.GetGlobalFontConfigLabel()
