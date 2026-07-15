@@ -68,12 +68,6 @@ jobs:
           path: source
           fetch-depth: 0
 
-      - name: Install LibEQOL into source
-        if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
-        uses: R41z0r/LibEQOL@v1.0.0
-        with:
-          destination: vendor
-
       - name: Prepare source packager gates
         if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'
         shell: bash
@@ -110,7 +104,6 @@ jobs:
           set -euo pipefail
           /usr/bin/rsync -a --exclude '.DS_Store' build/EnhancedDamageMeter/ ./
           git add -f -- CHANGELOG.md EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
-          git restore --staged -- libs/LibEQOL/libs/LibStub 2>/dev/null || true
 
       - name: Create Package and release
         if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'

@@ -69,19 +69,6 @@ if [ ! -d "${CORE_SOURCE_DIR}/Locales" ]; then
 	exit 1
 fi
 
-LIBEQOL_DIR="${TEMPLATE_DIR}/libs/LibEQOL"
-if [ ! -d "${LIBEQOL_DIR}" ]; then
-	LIBEQOL_DIR="${TEMPLATE_DIR}/vendor/LibEQOL"
-fi
-if [ ! -d "${LIBEQOL_DIR}" ]; then
-	LIBEQOL_DIR="${CORE_SOURCE_DIR}/libs/LibEQOL"
-fi
-if [ ! -d "${LIBEQOL_DIR}" ]; then
-	echo "LibEQOL source directory not found." >&2
-	echo "Install it into ${TEMPLATE_DIR}/vendor/LibEQOL or ${TEMPLATE_DIR}/libs/LibEQOL before building." >&2
-	exit 1
-fi
-
 rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}/libs" "${OUT_DIR}/Locales" "${OUT_DIR}/Core"
 
@@ -110,9 +97,5 @@ copy_dir "${CORE_SOURCE_DIR}/libs/LibDeflate" "${OUT_DIR}/libs/LibDeflate"
 copy_dir "${CORE_SOURCE_DIR}/libs/AceSerializer-3.0" "${OUT_DIR}/libs/AceSerializer-3.0"
 copy_dir "${CORE_SOURCE_DIR}/libs/LibSharedMedia-3.0" "${OUT_DIR}/libs/LibSharedMedia-3.0"
 copy_dir "${CORE_SOURCE_DIR}/libs/EnhanceQoLEditMode" "${OUT_DIR}/libs/EnhanceQoLEditMode"
-copy_dir "${LIBEQOL_DIR}" "${OUT_DIR}/libs/LibEQOL"
-
-find "${OUT_DIR}/libs/LibEQOL" -type f \( -name '*.lua' -o -name '*.xml' \) -print0 |
-	xargs -0 perl -0pi -e 's/LibEQOL(?:\@project-abbreviated-hash\@|[A-Za-z0-9]+)?_(SettingsListSectionHintTemplate|MultiDropdownTemplate|ScrollDropdownTemplate|InputControlTemplate|ColorOverridesPanel|ColorOverridesPanelNoHead|SoundDropdownTemplate|SortableListTemplate)/LibEQOL_EnhancedDamageMeter_$1/g'
 
 printf 'Built Enhanced Damage Meter at %s\n' "${OUT_DIR}"
