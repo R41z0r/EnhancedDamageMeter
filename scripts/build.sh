@@ -109,6 +109,7 @@ copy_dir "${CORE_SOURCE_DIR}/libs/AceLocale-3.0" "${OUT_DIR}/libs/AceLocale-3.0"
 copy_dir "${CORE_SOURCE_DIR}/libs/LibDeflate" "${OUT_DIR}/libs/LibDeflate"
 copy_dir "${CORE_SOURCE_DIR}/libs/AceSerializer-3.0" "${OUT_DIR}/libs/AceSerializer-3.0"
 copy_dir "${CORE_SOURCE_DIR}/libs/LibSharedMedia-3.0" "${OUT_DIR}/libs/LibSharedMedia-3.0"
+copy_dir "${CORE_SOURCE_DIR}/libs/EnhanceQoLEditMode" "${OUT_DIR}/libs/EnhanceQoLEditMode"
 copy_dir "${LIBEQOL_DIR}" "${OUT_DIR}/libs/LibEQOL"
 
 find "${OUT_DIR}/libs/LibEQOL" -type f \( -name '*.lua' -o -name '*.xml' \) -print0 |

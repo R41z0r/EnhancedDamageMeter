@@ -1,4 +1,4 @@
-## Interface: 120005, 120007
+## Interface: 120007, 120100
 ## Title: Enhanced Damage Meter
 ## Title-deDE: Enhanced Damage Meter
 ## Title-esES: Enhanced Damage Meter
@@ -39,6 +39,7 @@ libs\LibDeflate\lib.xml
 libs\AceSerializer-3.0\AceSerializer-3.0.xml
 libs\LibSharedMedia-3.0\lib.xml
 libs\LibEQOL\LibEQOL.xml
+libs\EnhanceQoLEditMode\EnhanceQoLEditMode.lua
 
 Locales\[TextLocale].lua
 Core.lua
