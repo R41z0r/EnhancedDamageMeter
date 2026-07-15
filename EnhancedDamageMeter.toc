@@ -38,7 +38,6 @@ libs\AceLocale-3.0\AceLocale-3.0.xml
 libs\LibDeflate\lib.xml
 libs\AceSerializer-3.0\AceSerializer-3.0.xml
 libs\LibSharedMedia-3.0\lib.xml
-libs\LibEQOL\LibEQOL.xml
 libs\EnhanceQoLEditMode\EnhanceQoLEditMode.lua
 
 Locales\[TextLocale].lua

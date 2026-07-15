@@ -36,7 +36,6 @@ exclude_files = {
 	".git/**",
 	"build/EnhancedDamageMeter/libs/**",
 	"EnhancedDamageMeter/libs/**",
-	"EnhanceQoL/libs/LibEQOL/**",
 	"source/**",
 	"vendor/**",
 	"EnhanceQoLBags/**",
