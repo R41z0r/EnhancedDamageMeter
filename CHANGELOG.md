@@ -7,3 +7,4 @@ Standalone package for the EnhanceQoL damage meter.
 ### Fixed
 
 - Restored standalone border rendering after the shared safe-border helper was introduced.
+- Fixed the Damage Meter failing to initialize after pixel-aligned layouts were introduced.

@@ -4,6 +4,99 @@ local L = LibStub("AceLocale-3.0"):GetLocale("EnhancedDamageMeter")
 local SharedMedia = LibStub("LibSharedMedia-3.0", true)
 
 addon.functions = addon.functions or {}
+addon.PixelUtil = addon.PixelUtil or {}
+
+local PixelUtil = addon.PixelUtil
+
+function PixelUtil.ApplyTexturePixelSnapping(texture, bias)
+	if not texture then return nil end
+	if texture.SetSnapToPixelGrid then texture:SetSnapToPixelGrid(false) end
+	if texture.SetTexelSnappingBias then texture:SetTexelSnappingBias(bias or 0) end
+	return texture
+end
+
+function PixelUtil.Round(value)
+	value = tonumber(value) or 0
+	if value >= 0 then return math.floor(value + 0.5) end
+	return math.ceil(value - 0.5)
+end
+
+function PixelUtil.GetPixelScale(region)
+	local scale
+	if region and region.GetEffectiveScale then
+		scale = region:GetEffectiveScale()
+	elseif UIParent and UIParent.GetEffectiveScale then
+		scale = UIParent:GetEffectiveScale()
+	elseif UIParent and UIParent.GetScale then
+		scale = UIParent:GetScale()
+	end
+	scale = tonumber(scale) or 1
+	if scale <= 0 then scale = 1 end
+
+	local _, physicalHeight
+	if GetPhysicalScreenSize then
+		_, physicalHeight = GetPhysicalScreenSize()
+	end
+	if (not physicalHeight or physicalHeight <= 0) and GetScreenHeight then
+		physicalHeight = GetScreenHeight()
+	end
+	physicalHeight = tonumber(physicalHeight) or 768
+	if physicalHeight <= 0 then physicalHeight = 768 end
+
+	local factor = 768 / physicalHeight
+	if factor <= 0 then factor = 1 end
+	return scale, factor
+end
+
+function PixelUtil.PixelsToUi(pixels, scale, factor)
+	scale = tonumber(scale) or 1
+	factor = tonumber(factor) or 1
+	if scale <= 0 then scale = 1 end
+	if factor <= 0 then factor = 1 end
+	return ((tonumber(pixels) or 0) * factor) / scale
+end
+
+function PixelUtil.OnePixel(region)
+	local scale, factor = PixelUtil.GetPixelScale(region)
+	return PixelUtil.PixelsToUi(1, scale, factor)
+end
+
+function PixelUtil.SizeFromPixels(region, pixels, minPixels)
+	pixels = tonumber(pixels) or 0
+	minPixels = tonumber(minPixels) or 0
+	if pixels > 0 and pixels < minPixels then pixels = minPixels end
+	if pixels < 0 and pixels > -minPixels then pixels = -minPixels end
+	local scale, factor = PixelUtil.GetPixelScale(region)
+	return PixelUtil.PixelsToUi(PixelUtil.Round(pixels), scale, factor)
+end
+
+function PixelUtil.Snap(value, region)
+	value = tonumber(value) or 0
+	if value == 0 then return 0 end
+	local onePixel = PixelUtil.OnePixel(region)
+	if onePixel <= 0 then return value end
+	return PixelUtil.Round(value / onePixel) * onePixel
+end
+
+function PixelUtil.Size(frame, width, height)
+	if not (frame and frame.SetSize) then return end
+	width = PixelUtil.Snap(width, frame)
+	height = height ~= nil and PixelUtil.Snap(height, frame) or width
+	frame:SetSize(width, height)
+end
+
+function PixelUtil.ApplySafeBorderTextureSnapping(frame, stateKey, bias)
+	local state = frame and frame[stateKey or "_eqolSafeBorder"]
+	if not state then return end
+	PixelUtil.ApplyTexturePixelSnapping(state.top, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.bottom, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.left, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.right, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.topLeft, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.topRight, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.bottomLeft, bias or 0)
+	PixelUtil.ApplyTexturePixelSnapping(state.bottomRight, bias or 0)
+end
 
 local GLOBAL_FONT_CONFIG_KEY = "__EQOL_GLOBAL_FONT__"
 local GLOBAL_FONT_CONFIG_LABEL = "Use global font config"
