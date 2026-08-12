@@ -65,6 +65,8 @@ jobs:
         with:
           repository: R41z0r/EnhanceQoL
           ref: ${{ steps.source.outputs.ref }}
+          token: ${{ secrets.ENHANCEQOL_READ_TOKEN }}
+          persist-credentials: false
           path: source
           fetch-depth: 0
 
