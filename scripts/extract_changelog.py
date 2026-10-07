@@ -86,6 +86,12 @@ def main():
 
     source_path = Path(args.source)
     output_path = Path(args.output)
+    # Prefer maintained standalone notes for the exact release version.
+    if output_path.exists():
+        maintained = read_version_section(output_path.read_text(encoding="utf-8").splitlines(), args.version)
+        if any(line.startswith("- ") for line in maintained):
+            output_path.write_text("# Enhanced Damage Meter\n\n" + "\n".join(maintained).rstrip() + "\n", encoding="utf-8")
+            return
     lines = source_path.read_text(encoding="utf-8").splitlines()
     section = read_version_section(lines, args.version)
     grouped = extract_entries(section)
