@@ -4,6 +4,10 @@ Standalone package for the EnhanceQoL damage meter.
 
 ## Unreleased
 
+### Fixed
+
+- Release packages now use the maintained release notes.
+
 ## [13.8.0] - 2026-10-07
 
 ### Added
