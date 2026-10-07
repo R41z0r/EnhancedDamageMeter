@@ -105,7 +105,7 @@ jobs:
         run: |
           set -euo pipefail
           /usr/bin/rsync -a --exclude '.DS_Store' build/EnhancedDamageMeter/ ./
-          git add -f -- CHANGELOG.md EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core Locales libs
+          git add -f -- CHANGELOG.md EnhancedDamageMeter.toc Core.lua Functions.lua Settings.lua DamageMeter.lua Icons Core General Locales libs
 
       - name: Create Package and release
         if: github.event_name == 'push' || github.ref_type == 'tag' || steps.trigger_tag.outputs.package_now == 'true'

@@ -4,6 +4,10 @@ _G[addonName] = addon
 
 addon.name = addonName
 addon.displayName = "Enhanced Damage Meter"
+addon.variables = addon.variables or {}
+local interfaceVersion = select(4, GetBuildInfo())
+addon.variables.isForever = interfaceVersion >= 16000 and interfaceVersion < 17000
+addon.variables.isTBC = false
 addon.DamageMeterHost = {
 	localeName = "EnhancedDamageMeter",
 	displayName = "Enhanced Damage Meter",

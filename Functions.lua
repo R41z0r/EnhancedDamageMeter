@@ -457,7 +457,7 @@ function addon.functions.ResolveFontStyleChoice(style, fallback)
 end
 
 function addon.functions.ApplyFontString(fontString, fontFace, size, style, fallbackFace, fallbackStyle)
-	if not (fontString and fontString.SetFont) then return false end
+	if not (fontString and fontString.SetFont) then return false, false end
 	local face = addon.functions.ResolveLSMMedia("font", fontFace, fallbackFace or STANDARD_TEXT_FONT, false) or fallbackFace or STANDARD_TEXT_FONT
 	if isGlobalFontConfigValue(fontFace) then face = fallbackFace or STANDARD_TEXT_FONT end
 	local styleChoice = addon.functions.ResolveFontStyleChoice(style, fallbackStyle or FONT_STYLE_OUTLINE)
@@ -465,6 +465,7 @@ function addon.functions.ApplyFontString(fontString, fontFace, size, style, fall
 	local flags = descriptor.flags
 	local fontSize = tonumber(size) or 12
 	local ok = isKnownFontAsset(face) and fontString:SetFont(face, fontSize, flags)
+	local requestedApplied = ok == true
 	if not ok and fallbackFace and fallbackFace ~= face then ok = fontString:SetFont(fallbackFace, fontSize, flags) end
 	if fontString.SetShadowColor and fontString.SetShadowOffset then
 		if descriptor.shadowAlpha and descriptor.shadowAlpha > 0 then
@@ -475,5 +476,5 @@ function addon.functions.ApplyFontString(fontString, fontFace, size, style, fall
 			fontString:SetShadowOffset(0, 0)
 		end
 	end
-	return ok
+	return ok, requestedApplied
 end

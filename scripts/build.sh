@@ -70,18 +70,26 @@ if [ ! -d "${CORE_SOURCE_DIR}/Locales" ]; then
 fi
 
 rm -rf "${OUT_DIR}"
-mkdir -p "${OUT_DIR}/libs" "${OUT_DIR}/Locales" "${OUT_DIR}/Core"
+mkdir -p "${OUT_DIR}/libs" "${OUT_DIR}/Locales" "${OUT_DIR}/Core" "${OUT_DIR}/General"
 
 cp "${TEMPLATE_DIR}/EnhancedDamageMeter.toc" "${OUT_DIR}/EnhancedDamageMeter.toc"
 cp "${TEMPLATE_DIR}/Core.lua" "${OUT_DIR}/Core.lua"
 cp "${TEMPLATE_DIR}/Functions.lua" "${OUT_DIR}/Functions.lua"
 cp "${TEMPLATE_DIR}/Settings.lua" "${OUT_DIR}/Settings.lua"
 cp "${DAMAGE_METER_FILE}" "${OUT_DIR}/DamageMeter.lua"
-cp "${CORE_SOURCE_DIR}/Core/EditModeLib.lua" "${OUT_DIR}/Core/EditModeLib.lua"
-cp "${CORE_SOURCE_DIR}/Core/EditMode.lua" "${OUT_DIR}/Core/EditMode.lua"
+for file in EditMode EditModeNavigation EditModeNavigationDefaults EditModeNavigationProfiles; do
+	cp "${CORE_SOURCE_DIR}/Core/${file}.lua" "${OUT_DIR}/Core/${file}.lua"
+done
+cp "${CORE_SOURCE_DIR}/General/DurationText.lua" "${OUT_DIR}/General/DurationText.lua"
 copy_dir "${TEMPLATE_DIR}/Icons" "${OUT_DIR}/Icons"
+for icon in ClosedLock OpenLock; do
+	cp "${CORE_SOURCE_DIR}/Icons/${icon}.tga" "${OUT_DIR}/Icons/${icon}.tga"
+done
 
-perl -0pi -e 's/_G\.EnhanceQoLDB/_G.EnhancedDamageMeterDB/g; s/category = "EnhanceQoL"/category = "Enhanced Damage Meter"/g' "${OUT_DIR}/Core/EditMode.lua"
+# Keep copied core helpers attached to the standalone host, even when the
+# parent addon is loaded alongside it.
+perl -0pi -e 's/_G\.EnhanceQoLDB/_G.EnhancedDamageMeterDB/g; s/_G\.EnhanceQoL\b/_G.EnhancedDamageMeter/g; s/GetLocale\("EnhanceQoL"\)/GetLocale("EnhancedDamageMeter")/g' "${OUT_DIR}"/Core/*.lua
+perl -0pi -e 's/AddOns\\\\EnhanceQoL\\\\Icons/AddOns\\\\EnhancedDamageMeter\\\\Icons/g' "${OUT_DIR}/DamageMeter.lua"
 perl -0pi -e 's/local parentAddonName = "EnhanceQoL"/local parentAddonName = "EnhancedDamageMeter"/' "${OUT_DIR}/DamageMeter.lua"
 
 for locale in "${CORE_SOURCE_DIR}"/Locales/*.lua; do
