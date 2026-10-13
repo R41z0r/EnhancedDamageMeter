@@ -4,6 +4,13 @@ Standalone package for the EnhanceQoL damage meter.
 
 ## Unreleased
 
+## [13.12.0] - 2026-10-13
+
+### Changed
+
+- Updated the shared Edit Mode helpers and bundled media support.
+- Updated compatibility metadata for Retail 12.1 and 12.1.5.
+
 ### Fixed
 
 - Release packages now use the maintained release notes.

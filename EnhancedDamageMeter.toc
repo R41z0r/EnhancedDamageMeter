@@ -1,4 +1,4 @@
-## Interface: 120007, 120100, 16001
+## Interface: 120100, 120105, 16001
 ## Title: Enhanced Damage Meter
 ## Title-deDE: Enhanced Damage Meter
 ## Title-esES: Enhanced Damage Meter

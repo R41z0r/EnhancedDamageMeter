@@ -66,6 +66,7 @@ ignore = {
 	"582", --  error-prone operator orders
 }
 globals = {
+	"C_UIFileAsset",
 	"_G",
 	"bit",
 	"Constants",
