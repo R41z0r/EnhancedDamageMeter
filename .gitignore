@@ -9,3 +9,6 @@
 /Locales/
 /source/
 /vendor/
+
+source-report.md
+__pycache__/

@@ -4,6 +4,11 @@ Standalone package for the EnhanceQoL damage meter.
 
 ## Unreleased
 
+### Changed
+
+- Automatically checks published Enhance QoL releases hourly and publishes updates when the standalone package changes.
+- Retail and Forever compatibility metadata now follows the bundled source release.
+
 ## [13.12.0] - 2026-10-13
 
 ### Changed

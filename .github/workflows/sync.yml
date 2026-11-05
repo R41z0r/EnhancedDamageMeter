@@ -1,0 +1,81 @@
+name: Sync published EQOL changes
+on:
+  schedule:
+    - cron: '37 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: source-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require completed previous release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open("source.json"))["version"])')
+          gh release view "$version" >/dev/null
+      - uses: actions/checkout@v4
+        with:
+          repository: R41z0r/EnhanceQoL
+          token: ${{ secrets.ENHANCEQOL_READ_TOKEN }}
+          path: .source
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Read published source releases
+        env:
+          GH_TOKEN: ${{ secrets.ENHANCEQOL_READ_TOKEN }}
+        run: gh api --paginate --slurp repos/R41z0r/EnhanceQoL/releases > "$RUNNER_TEMP/source-releases.json"
+      - name: Compare published Retail payload
+        id: candidate
+        run: python3 scripts/auto_release.py --source .source --releases "$RUNNER_TEMP/source-releases.json" --github-output "$GITHUB_OUTPUT"
+      - name: Test source release selection
+        run: python3 tests/auto_release.py
+      - name: Install validators
+        if: steps.candidate.outputs.changed == 'true'
+        run: sudo apt-get update && sudo apt-get install -y lua5.1 lua-check
+      - name: Validate changed candidate
+        if: steps.candidate.outputs.changed == 'true'
+        run: |
+          git -C .source checkout --detach "$(python3 -c 'import json; print(json.load(open("source.json"))["ref"])')"
+          bash .source/scripts/prepare_packager_gates.sh "${{ steps.candidate.outputs.version }}"
+          bash scripts/build.sh build/EnhancedDamageMeter .source
+          lua5.1 scripts/test_standalone.lua build/EnhancedDamageMeter 120105
+          lua5.1 scripts/test_standalone.lua build/EnhancedDamageMeter 120107
+          lua5.1 scripts/test_standalone.lua build/EnhancedDamageMeter 16001
+          find build/EnhancedDamageMeter -name '*.lua' -exec luac5.1 -p {} \;
+          python3 .source/scripts/check_lua_upvalues.py build/EnhancedDamageMeter
+          luacheck --no-color -q build/EnhancedDamageMeter
+          git diff --check
+      - name: Commit and tag validated update
+        if: steps.candidate.outputs.changed == 'true'
+        env:
+          VERSION: ${{ steps.candidate.outputs.version }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add source.json CHANGELOG.md
+          git commit -m "Update Damage Meter to $VERSION"
+          git tag -a "$VERSION" -m "$VERSION"
+          git push --atomic origin HEAD:main "refs/tags/$VERSION"
+      - name: Dispatch publication of immutable tag
+        if: steps.candidate.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.candidate.outputs.version }}
+        run: gh workflow run release.yml --ref "$VERSION"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-comparison
+          path: |
+            source-report.md
+            source.json
+          if-no-files-found: ignore

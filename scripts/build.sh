@@ -73,6 +73,19 @@ rm -rf "${OUT_DIR}"
 mkdir -p "${OUT_DIR}/libs" "${OUT_DIR}/Locales" "${OUT_DIR}/Core" "${OUT_DIR}/General"
 
 cp "${TEMPLATE_DIR}/EnhancedDamageMeter.toc" "${OUT_DIR}/EnhancedDamageMeter.toc"
+# Keep both supported clients aligned with the pinned source release.
+python3 - "${CORE_SOURCE_DIR}/EnhanceQoL.toc" "${OUT_DIR}/EnhancedDamageMeter.toc" <<'PYTHON'
+from pathlib import Path
+import re
+import sys
+source, target = map(Path, sys.argv[1:])
+text = source.read_text()
+retail = re.search(r"^## Interface: (.+)$", text, re.M)
+forever = re.search(r"^## Interface-Forever: (.+)$", text, re.M)
+assert retail and forever, "Missing supported client interface metadata"
+interfaces = ", ".join(dict.fromkeys(v.strip() for v in (retail[1] + "," + forever[1]).split(",")))
+target.write_text(re.sub(r"^## Interface: .+$", "## Interface: " + interfaces, target.read_text(), flags=re.M))
+PYTHON
 cp "${TEMPLATE_DIR}/Core.lua" "${OUT_DIR}/Core.lua"
 cp "${TEMPLATE_DIR}/Functions.lua" "${OUT_DIR}/Functions.lua"
 cp "${TEMPLATE_DIR}/Settings.lua" "${OUT_DIR}/Settings.lua"
