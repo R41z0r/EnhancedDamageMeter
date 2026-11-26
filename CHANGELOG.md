@@ -4,6 +4,12 @@ Standalone package for the EnhanceQoL damage meter.
 
 ## Unreleased
 
+## [13.24.2] - 2026-11-26
+
+### Changed
+
+- Updated the Damage Meter and shared helpers with changes from Enhance QoL 13.24.2.
+
 ## [13.24.1] - 2026-11-25
 
 ### Changed
